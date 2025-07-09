@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz App</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-gray-100 font-sans">
+    <div id="app" class="min-h-screen flex items-center justify-center">
+        <!-- Login Page -->
+        <div id="login-page" class="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
+            <h1 class="text-2xl font-bold mb-6 text-center">Quiz App Login</h1>
+            <div id="login-error" class="text-red-500 mb-4 hidden"></div>
+            <input type="email" id="login-email" placeholder="Email" value="samsonemmanuel9025@gmail.com" class="w-full p-2 mb-4 border rounded">
+            <input type="password" id="login-password" placeholder="Password" class="w-full p-2 mb-4 border rounded">
+            <button onclick="login()" class="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600 flex items-center justify-center">
+                <span class="button-text">Login</span>
+                <span class="loading-spinner hidden animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full ml-2"></span>
+            </button>
+            <p class="mt-4 text-center"><a href="#" onclick="showForgotPassword()" class="text-blue-500">Forgot Password?</a></p>
+        </div>
+
+        <!-- Forgot Password Page -->
+        <div id="forgot-password-page" class="bg-white p-8 rounded-lg shadow-lg w-full max-w-md hidden">
+            <h1 class="text-2xl font-bold mb-6 text-center">Reset Password</h1>
+            <input type="email" id="forgot-email" placeholder="Enter your email" value="samsonemmanuel9025@gmail.com" class="w-full p-2 mb-4 border rounded">
+            <button onclick="resetPassword()" class="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600 flex items-center justify-center">
+                <span class="button-text">Send Reset Link</span>
+                <span class="loading-spinner hidden animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full ml-2"></span>
+            </button>
+            <p class="mt-4 text-center"><a href="#" onclick="showLogin()" class="text-blue-500">Back to Login</a></p>
+        </div>
+
+        <!-- User Dashboard -->
+        <div id="user-dashboard" class="hidden p-8">
+            <h1 class="text-3xl font-bold mb-6">Welcome, <span id="user-name"></span></h1>
+            <h2 class="text-xl mb-4">Previous Scores</h2>
+            <div id="user-scores" class="mb-6"></div>
+            <h2 class="text-xl mb-4">Available Quizzes</h2>
+            <div id="quiz-categories" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+            <button onclick="logout()" class="mt-6 bg-red-500 text-white p-2 rounded hover:bg-red-600 flex items-center justify-center">
+                <span class="button-text">Logout</span>
+                <span class="loading-spinner hidden animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full ml-2"></span>
+            </button>
+        </div>
+
+        <!-- Admin Panel -->
+        <div id="admin-panel" class="hidden">
+            <h2 class="text-2xl font-bold mb-4">Admin Panel</h2>
+            <button onclick="logout()" class="mt-6 bg-red-500 text-white p-2 rounded hover:bg-red-600 flex items-center justify-center">
+                <span class="button-text">Logout</span>
+                <span class="loading-spinner hidden animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full ml-2"></span>
+            </button>
+
+            <!-- Quiz Management -->
+            <div class="mb-8">
+                <h3 class="text-xl font-semibold">Manage Quizzes</h3>
+                <div id="quiz-list" class="mt-2"></div>
+                <select id="quiz-select" class="border p-2 mt-2"></select>
+                <select id="question-quiz-select" class="border p-2 mt-2"></select>
+                <!-- Add Quiz Form -->
+                <div>
+                    <input id="quiz-title" placeholder="Quiz Title" class="border p-2 mt-2">
+                    <input id="quiz-category" placeholder="Category" class="border p-2 mt-2">
+                    <input id="quiz-start-date" type="date" class="border p-2 mt-2">
+                    <input id="quiz-start-time" type="time" class="border p-2 mt-2">
+                    <button onclick="createQuiz()" class="bg-green-500 text-white p-2 rounded mt-2 flex items-center justify-center">
+                        <span class="button-text">Create Quiz</span>
+                        <span class="loading-spinner hidden animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full ml-2"></span>
+                    </button>
+                    <p id="quiz-error" class="text-red-500 hidden"></p>
+                </div>
+                <!-- Edit Quiz Form -->
+                <div id="edit-quiz-form" class="hidden">
+                    <input id="edit-quiz-id" type="hidden">
+                    <input id="edit-quiz-title" placeholder="Quiz Title" class="border p-2 mt-2">
+                    <input id="edit-quiz-category" placeholder="Category" class="border p-2 mt-2">
+                    <input id="edit-quiz-start-date" type="date" class="border p-2 mt-2">
+                    <input id="edit-quiz-start-time" type="time" class="border p-2 mt-2">
+                    <button onclick="updateQuiz()" class="bg-blue-500 text-white p-2 rounded mt-2 flex items-center justify-center">
+                        <span class="button-text">Update Quiz</span>
+                        <span class="loading-spinner hidden animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full ml-2"></span>
+                    </button>
+                    <p id="edit-quiz-error" class="text-red-500 hidden"></p>
+                </div>
+            </div>
+
+            <!-- Question Management -->
+            <div class="mb-8">
+                <h3 class="text-xl font-semibold">Manage Questions</h3>
+                <div id="question-list" class="mt-2"></div>
+                <!-- Add Question Form -->
+                <div>
+                    <input id="question-text" placeholder="Question Text" class="border p-2 mt-2">
+                    <input id="option1" placeholder="Option 1" class="border p-2 mt-2">
+                    <input id="option2" placeholder="Option 2" class="border p-2 mt-2">
+                    <input id="option3" placeholder="Option 3" class="border p-2 mt-2">
+                    <input id="option4" placeholder="Option 4" class="border p-2 mt-2">
+                    <input id="correct-option" placeholder="Correct Option (1-4)" type="number" class="border p-2 mt-2">
+                    <button onclick="addQuestion()" class="bg-green-500 text-white p-2 rounded mt-2 flex items-center justify-center">
+                        <span class="button-text">Add Question</span>
+                        <span class="loading-spinner hidden animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full ml-2"></span>
+                    </button>
+                    <p id="question-error" class="text-red-500 hidden"></p>
+                </div>
+                <!-- Edit Question Form -->
+                <div id="edit-question-form" class="hidden">
+                    <input id="edit-question-id" type="hidden">
+                    <input id="edit-question-quiz-id" type="hidden">
+                    <input id="edit-question-text" placeholder="Question Text" class="border p-2 mt-2">
+                    <input id="edit-option1" placeholder="Option 1" class="border p-2 mt-2">
+                    <input id="edit-option2" placeholder="Option 2" class="border p-2 mt-2">
+                    <input id="edit-option3" placeholder="Option 3" class="border p-2 mt-2">
+                    <input id="edit-option4" placeholder="Option 4" class="border p-2 mt-2">
+                    <input id="edit-correct-option" placeholder="Correct Option (1-4)" type="number" class="border p-2 mt-2">
+                    <button onclick="updateQuestion()" class="bg-blue-500 text-white p-2 rounded mt-2 flex items-center justify-center">
+                        <span class="button-text">Update Question</span>
+                        <span class="loading-spinner hidden animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full ml-2"></span>
+                    </button>
+                    <p id="edit-question-error" class="text-red-500 hidden"></p>
+                </div>
+            </div>
+
+            <!-- User Management -->
+            <div class="mb-8">
+                <h3 class="text-xl font-semibold">Manage Users</h3>
+                <div id="user-list" class="mt-2"></div>
+                <input id="new-user-email" placeholder="Email" class="border p-2 mt-2">
+                <input id="new-user-name" placeholder="Name" class="border p-2 mt-2">
+                <input id="new-user-password" placeholder="Password" type="password" class="border p-2 mt-2">
+                <select id="new-user-role" class="border p-2 mt-2">
+                    <option value="user">User</option>
+                    <option value="admin">Admin</option>
+                </select>
+                <button onclick="addUser()" class="bg-green-500 text-white p-2 rounded mt-2 flex items-center justify-center">
+                    <span class="button-text">Add User</span>
+                    <span class="loading-spinner hidden animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full ml-2"></span>
+                </button>
+                <p id="user-error" class="text-red-500 hidden"></p>
+            </div>
+
+            <!-- Scores -->
+            <div>
+                <h3 class="text-xl font-semibold">Scores</h3>
+                <div id="admin-scores" class="mt-2"></div>
+            </div>
+        </div>
+
+        <!-- Quiz Page -->
+        <div id="quiz-page" class="hidden p-8">
+            <h1 class="text-3xl font-bold mb-6">Quiz: <span id="quiz-title-display"></span></h1>
+            <div id="timer" class="text-xl mb-4"></div>
+            <div id="questions" class="mb-6"></div>
+            <button onclick="reviewAnswers()" class="bg-blue-500 text-white p-2 rounded hover:bg-blue-600">Review Answers</button>
+            <button onclick="submitQuiz()" class="bg-green-500 text-white p-2 rounded hover:bg-green-600 flex items-center justify-center">
+                <span class="button-text">Submit Quiz</span>
+                <span class="loading-spinner hidden animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full ml-2"></span>
+            </button>
+        </div>
+
+        <!-- Review Page -->
+        <div id="review-page" class="hidden p-8">
+            <h1 class="text-3xl font-bold mb-6">Review Answers</h1>
+            <div id="review-questions" class="mb-6"></div>
+            <button onclick="submitQuiz()" class="bg-green-500 text-white p-2 rounded hover:bg-green-600 flex items-center justify-center">
+                <span class="button-text">Submit Quiz</span>
+                <span class="loading-spinner hidden animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full ml-2"></span>
+            </button>
+            <button onclick="backToQuiz()" class="bg-gray-500 text-white p-2 rounded hover:bg-gray-600">Back to Quiz</button>
+        </div>
+
+        <!-- Results Page -->
+        <div id="results-page" class="hidden p-8">
+            <h1 class="text-3xl font-bold mb-6">Quiz Results</h1>
+            <div id="results" class="mb-6"></div>
+            <button onclick="backToDashboard()" class="bg-blue-500 text-white p-2 rounded hover:bg-blue-600">Back to Dashboard</button>
+        </div>
+
+        <!-- Leaderboard Page -->
+        <div id="leaderboard-page" class="hidden p-8">
+            <h1 class="text-3xl font-bold mb-6">Leaderboard</h1>
+            <div id="leaderboard" class="mb-6"></div>
+            <button onclick="backToDashboard()" class="bg-blue-500 text-white p-2 rounded hover:bg-blue-600">Back to Dashboard</button>
+        </div>
+    </div>
+    <script src="scripts.js"></script>
+</body>
+</html>
