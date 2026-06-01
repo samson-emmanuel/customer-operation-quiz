@@ -207,6 +207,11 @@ async function startQuiz(quizId) {
             return;
         }
 
+        for (let i = questions.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [questions[i], questions[j]] = [questions[j], questions[i]];
+        }
+
         userAnswers = {};
         timeLeft = 10 * 60;
         if (timerInterval) clearInterval(timerInterval);
@@ -226,17 +231,16 @@ async function startQuiz(quizId) {
         const timerElement = document.getElementById('timer');
         timerElement.textContent = '10:00';
         timerInterval = setInterval(() => {
+            timeLeft--;
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            timerElement.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
             if (timeLeft <= 0) {
                 clearInterval(timerInterval);
                 timerInterval = null;
                 alert('Time is up! Submitting quiz automatically.');
                 submitQuiz();
-                return;
             }
-            timeLeft--;
-            const minutes = Math.floor(timeLeft / 60);
-            const seconds = timeLeft % 60;
-            timerElement.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
         }, 1000);
 
         questions.forEach(question => {
